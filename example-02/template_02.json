@@ -1,0 +1,57 @@
+{
+	"variables": {
+	"aws_access_key": "",
+	"aws_secret_key": ""
+	},
+	"builders": [{
+		"type": "amazon-ebs",
+		"access_key": "{{user `aws_access_key`}}",
+		"secret_key": "{{user `aws_secret_key`}}",
+		"region": "us-west-2",
+		"source_ami_filter": {
+			"filters": {
+				"virtualization-type": "hvm",
+				"name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+				"root-device-type": "ebs"
+			},
+			"owners": ["099720109477"],
+			"most_recent": true
+		},
+        "skip_create_ami": "false",
+		"instance_type": "t2.micro",
+		"ssh_username": "ubuntu",
+		"ami_name": "packer-example-ocs-ansible {{timestamp}}",
+        "launch_block_device_mappings" : [
+            {
+                "device_name": "/dev/sda1",
+                "volume_size": 8,
+                "volume_type": "gp2",
+                "delete_on_termination": true
+            }
+        ]
+	}],
+    "provisioners" : [
+        {
+            "type" : "file",
+            "source": "ocs-rocks.txt",
+            "destination": "/tmp/ocs-rocks.txt"
+        },
+        {
+            "type": "shell",
+            "scripts": ["./provisioners/mysql.sh"],
+            "pause_before": "4s"
+        },
+        {
+            "type": "shell",
+            "execute_command": "echo 'ubuntu' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+            "inline": [
+                "sleep 30",
+                "apt-add-repository ppa:ansible/ansible -y",
+                "/usr/bin/apt-get update",
+                "/usr/bin/apt-get -y install ansible",
+                "mkdir /var/www",
+                "chown ubuntu:ubuntu /var/www"
+            ]
+        }
+    ]
+}
