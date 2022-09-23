@@ -1,0 +1,13 @@
+key_name             = "node-stg"
+security_groups      = ["xxxxxxx"]
+lc_name              = "node-stg-"
+ami_name_value       = ["packer-example-ocs-ansible-node*"]
+asg_name             = "node-asg-stg"
+iam_role             = "node-iam-role-stg"
+iam_instance_profile = "node-iam_instance_profile"
+profile_name         = "node-profile-name-stg"
+inline_policy        = "node-inline"
+ec2_name             = "node-stg"
+environment          = "stg"
+instance_type        = "t2.small"
+vpc_zone_identifier  = ["xxxxxxx", "xxxxxxx"]

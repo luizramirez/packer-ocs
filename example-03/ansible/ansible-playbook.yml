@@ -1,0 +1,7 @@
+---
+- name: setup webapp
+  hosts: all
+  become: yes
+
+  roles:
+  - nodejs

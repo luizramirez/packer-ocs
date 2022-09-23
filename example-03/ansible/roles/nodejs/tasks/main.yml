@@ -1,0 +1,26 @@
+---
+- name: install nodejs with curl
+  shell: curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+
+- name: install nodejs
+  apt: name={{ item }} state=present
+  with_items:
+    - nodejs
+
+- name: install express
+  npm:
+    name: express
+    path: /var/www
+
+- name: configure systemctl
+  template:
+    src: node.service
+    dest: /etc/systemd/system/node.service
+
+- name: enable systemctl service
+  shell: systemctl enable node.service
+  become: true
+
+- name: systemctl reload
+  shell: systemctl daemon-reload
+  become: true

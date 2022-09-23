@@ -1,0 +1,44 @@
+{
+	"variables": {
+	"aws_access_key": "",
+	"aws_secret_key": ""
+	},
+	"builders": [{
+		"type": "amazon-ebs",
+		"access_key": "{{user `aws_access_key`}}",
+		"secret_key": "{{user `aws_secret_key`}}",
+		"region": "us-west-2",
+        "skip_create_ami": "false",
+		"instance_type": "t2.micro",
+		"ssh_username": "ubuntu",
+        "source_ami": "ami-0b61ad6f4f2a5a8a8",
+		"ami_name": "packer-example-ocs-ansible-node {{timestamp}}",
+        "launch_block_device_mappings" : [
+            {
+                "device_name": "/dev/sda1",
+                "volume_size": 8,
+                "volume_type": "gp2",
+                "delete_on_termination": true
+            }
+        ]
+	}],
+    "provisioners" : [
+        {
+            "type" : "file",
+            "source": "ocs-rocks.txt",
+            "destination": "/var/www/ocs-rocks.txt"
+        },
+        {
+            "type" : "file",
+            "source": "app.js",
+            "destination": "/var/www/app.js"
+        },
+        {
+            "type": "ansible-local",
+            "playbook_file": "ansible/ansible-playbook.yml",
+            "role_paths": [
+                "ansible/roles/nodejs"
+            ]
+        }
+    ]
+}
